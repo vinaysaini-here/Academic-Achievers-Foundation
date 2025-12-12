@@ -1,29 +1,135 @@
+// import express from "express";
+// import dotenv from "dotenv";
+// import cors from "cors";
+// import cookieParser from "cookie-parser";
+// import passport from "passport";
+// import path from "path"
+// import { fileURLToPath } from "url"; 
+// import { connectDB } from "./src/config/connectDB.js";
+// import userRoutes from "./src/routes/auth.routes.js";
+// import donarRoutes from "./src/routes/donation.route.js";
+// import memberRoutes from "./src/routes/member.routes.js";
+// import documentRoutes from "./src/routes/document.routes.js"
+// import "./src/config/passport-jwt-strategy.js";
+// import "./src/config/googleStrategy.js";
+// import setTokensCookies from "./src/utils/setTokenCookies.js";
+// dotenv.config();
+
+// const app = express();
+// app.use(express.json());
+// app.use("/uploads", express.static(path.join(process.cwd(), "src/uploads")));
+
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
+
+// const corsOptions = {
+//   origin: ["http://localhost:5173","https://academic-achievers-foundation.onrender.com/"],
+//   credentials: true,
+//   optionsSuccessStatus: 200,
+// };
+// app.use(cors(corsOptions));
+// app.use(cookieParser());
+// app.use(passport.initialize());
+
+// // Database Connection..
+
+// connectDB();
+
+// // Routes..
+
+// app.use("/api/user", userRoutes);
+// app.use("/api/donation", donarRoutes);
+// app.use("/api/member", memberRoutes);
+// app.use("/api/document",documentRoutes)
+
+
+
+
+
+// app.get(
+//   "/auth/google",
+//   passport.authenticate("google", {
+//     session: false,
+//     scope: ["profile", "email"],
+//   })
+// );
+
+// app.get(
+//   "/auth/google/callback",
+//   passport.authenticate("google", {
+//     session: false,
+//     failureRedirect: "http://localhost:5173/signin",
+//   }),
+//   (req, res) => {
+//     // console.log("Google OAuth Callback Triggered");
+
+//     if (!req.user) {
+//       console.error(" Google Authentication Failed");
+//       return res.redirect("http://localhost:5173/signin");
+//     }
+
+//     // console.log(" User Authenticated:", req.user);
+
+//     // Set cookies for authentication
+//     const { accessToken, refreshToken, accessTokenExp, refreshTokenExp } = req.user;
+//     setTokensCookies(res, accessToken, refreshToken, accessTokenExp, refreshTokenExp);
+
+//     res.redirect("http://localhost:5173/");
+//   }
+// );
+
+
+
+// if (process.env.NODE_ENV === "production") {
+//   app.use(express.static(path.join(__dirname, "../Frontend/dist")));
+
+//   app.get("*", (req, res) => {
+//     res.sendFile(path.join(__dirname, "../Frontend", "dist", "index.html"));
+//   });
+// }
+
+// const PORT = process.env.PORT || 8000;
+// app.listen(PORT, () => {
+//   console.log(`Server is Running on Port ${PORT}`);
+// });
+
+
+// backend/index.js
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import passport from "passport";
-import path from "path"
-import { fileURLToPath } from "url"; 
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
 import { connectDB } from "./src/config/connectDB.js";
 import userRoutes from "./src/routes/auth.routes.js";
 import donarRoutes from "./src/routes/donation.route.js";
 import memberRoutes from "./src/routes/member.routes.js";
-import documentRoutes from "./src/routes/document.routes.js"
+import documentRoutes from "./src/routes/document.routes.js";
 import "./src/config/passport-jwt-strategy.js";
 import "./src/config/googleStrategy.js";
 import setTokensCookies from "./src/utils/setTokenCookies.js";
+
 dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use("/uploads", express.static(path.join(process.cwd(), "src/uploads")));
 
+// ESM __dirname / __filename
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Serve uploads
+app.use("/uploads", express.static(path.join(__dirname, "src", "uploads")));
+
+// NOTE: remove trailing slash from origin (case-sensitive)
 const corsOptions = {
-  origin: ["http://localhost:5173","https://academic-achievers-foundation.onrender.com/"],
+  origin: [
+    "http://localhost:5173",
+    "https://academic-achievers-foundation.onrender.com"
+  ],
   credentials: true,
   optionsSuccessStatus: 200,
 };
@@ -31,64 +137,58 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(passport.initialize());
 
-// Database Connection..
-
+// Database Connection
 connectDB();
 
-// Routes..
-
+// Routes
 app.use("/api/user", userRoutes);
 app.use("/api/donation", donarRoutes);
 app.use("/api/member", memberRoutes);
-app.use("/api/document",documentRoutes)
+app.use("/api/document", documentRoutes);
 
-
-
-
-
+// OAuth routes
 app.get(
   "/auth/google",
-  passport.authenticate("google", {
-    session: false,
-    scope: ["profile", "email"],
-  })
+  passport.authenticate("google", { session: false, scope: ["profile", "email"] })
 );
 
 app.get(
   "/auth/google/callback",
-  passport.authenticate("google", {
-    session: false,
-    failureRedirect: "http://localhost:5173/signin",
-  }),
+  passport.authenticate("google", { session: false, failureRedirect: "http://localhost:5173/signin" }),
   (req, res) => {
-    // console.log("Google OAuth Callback Triggered");
-
     if (!req.user) {
-      console.error(" Google Authentication Failed");
+      console.error("Google Authentication Failed");
       return res.redirect("http://localhost:5173/signin");
     }
 
-    // console.log(" User Authenticated:", req.user);
-
-    // Set cookies for authentication
     const { accessToken, refreshToken, accessTokenExp, refreshTokenExp } = req.user;
     setTokensCookies(res, accessToken, refreshToken, accessTokenExp, refreshTokenExp);
-
     res.redirect("http://localhost:5173/");
   }
 );
 
-
-
+// Production static serving (case-sensitive path)
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../Frontend/dist")));
+  const frontendDist = path.join(__dirname, "../frontend/dist"); // ensure folder name matches repo
+  console.log("DEBUG: production mode. checking frontend dist at:", frontendDist);
+  console.log("DEBUG: frontend dist exists?", fs.existsSync(frontendDist));
 
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../Frontend", "dist", "index.html"));
-  });
+  if (fs.existsSync(frontendDist)) {
+    app.use(express.static(frontendDist));
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(frontendDist, "index.html"));
+    });
+  } else {
+    console.error("ERROR: frontend dist not found at", frontendDist);
+    // fallback minimal response so the server still binds a port
+    app.get("*", (req, res) => {
+      res.status(500).send("Frontend build not found. Please run build and deploy correctly.");
+    });
+  }
 }
 
-const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => {
-  console.log(`Server is Running on Port ${PORT}`);
+// PORT binding - ensure Render detects it by binding to 0.0.0.0
+const PORT = Number(process.env.PORT) || 8000;
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server is Running on Port ${PORT} and bound to 0.0.0.0`);
 });
