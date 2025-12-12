@@ -23,7 +23,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const corsOptions = {
-  origin: ["http://localhost:5173"],
+  origin: ["http://localhost:5173","https://academic-achievers-foundation.onrender.com/"],
   credentials: true,
   optionsSuccessStatus: 200,
 };
