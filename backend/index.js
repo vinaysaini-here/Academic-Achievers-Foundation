@@ -18,6 +18,9 @@ const app = express();
 app.use(express.json());
 app.use("/uploads", express.static(path.join(process.cwd(), "src/uploads")));
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const corsOptions = {
   origin: ["http://localhost:5173"],
   credentials: true,
@@ -73,6 +76,16 @@ app.get(
     res.redirect("http://localhost:5173/");
   }
 );
+
+
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../Frontend/dist")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../Frontend", "dist", "index.html"));
+  });
+}
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {

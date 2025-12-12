@@ -12,10 +12,8 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "@prisma/client": "^6.16.2",
-    "aws-sdk": "^2.1692.0",
+    "achievers-foundation": "file:..",
     "bcrypt": "^6.0.0",
-    "cloudinary": "^2.7.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
