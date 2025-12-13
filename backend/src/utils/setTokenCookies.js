@@ -49,7 +49,7 @@ const setTokensCookies = (res, accessToken, refreshToken) => {
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
     secure: true,
-    sameSite: "None",
+    // sameSite: "None",
     maxAge: accessTokenMaxAge,
   });
 
@@ -57,7 +57,7 @@ const setTokensCookies = (res, accessToken, refreshToken) => {
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: true,
-    sameSite: "None",
+    // sameSite: "None",
     maxAge: refreshTokenMaxAge,
   });
 
@@ -65,7 +65,7 @@ const setTokensCookies = (res, accessToken, refreshToken) => {
   res.cookie("is_auth", "true", {
     httpOnly: false,
     secure: true,
-    sameSite: "None",
+    // sameSite: "None",
     maxAge: refreshTokenMaxAge,
   });
 };
