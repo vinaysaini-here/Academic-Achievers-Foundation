@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.MODE === "development" ? "http://localhost:8000" : "http://localhost:8000",
+  baseURL: import.meta.env.MODE === "development" ? "http://localhost:8000" : "https://academic-achievers-foundation.onrender.com",
   withCredentials: true,
 });
 
