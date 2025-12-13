@@ -128,7 +128,8 @@ const corsOptions = {
   origin: [
     "http://localhost:5173",
     "https://academic-achievers-foundation1.netlify.app",
-    "https://academic-achievers-foundation-1.onrender.com"
+    "https://academic-achievers-foundation-1.onrender.com",
+    "https://academic-achievers-foundation-2.onrender.com"
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
